@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CSC830 — Quiz &amp; Exam Hub</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Serif:ital,wght@0,400;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  :root{--ink:#1a1a2e;--paper:#f7f6f2;--rule:#d4cfc4;--accent:#2d4a8a;--accent-light:#e8edf7;
+    --accent2:#8a2d2d;--accent2-light:#f7e8e8;--gold:#b5891a;--gold-light:#fdf4e0;
+    --green:#1a6b3a;--green-light:#e6f4ec;--violet:#5a3d8a;--violet-light:#efeaf7;
+    --mono:'IBM Plex Mono',monospace;--serif:'IBM Plex Serif',Georgia,serif;--sans:'Inter',system-ui,sans-serif;}
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:var(--sans);background:var(--paper);color:var(--ink);font-size:16px;line-height:1.6;}
+  .masthead{background:var(--ink);color:#fff;padding:1.8rem 2rem 1.4rem;text-align:center;border-bottom:4px solid var(--accent);}
+  .masthead .eyebrow{font-family:var(--mono);font-size:0.7rem;letter-spacing:0.2em;text-transform:uppercase;color:#a0a8c0;margin-bottom:0.5rem;}
+  .masthead h1{font-family:var(--serif);font-size:clamp(1.5rem,4vw,2.2rem);font-weight:600;}
+  nav{background:#fff;border-bottom:1px solid var(--rule);padding:0.7rem 1rem;position:sticky;top:0;z-index:100;display:flex;gap:0.5rem;justify-content:center;flex-wrap:wrap;align-items:center;}
+  .modebtn{font-family:var(--mono);font-size:0.76rem;letter-spacing:0.05em;color:var(--accent);background:#fff;border:1px solid var(--accent);border-radius:3px;padding:0.4rem 1.1rem;cursor:pointer;transition:all .15s;}
+  .modebtn.active{background:var(--accent);color:#fff;}
+  .modebtn:focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
+  .timer{font-family:var(--mono);font-size:0.85rem;font-weight:500;color:var(--accent2);margin-left:auto;padding:0.3rem 0.7rem;border:1px solid var(--accent2);border-radius:3px;background:#fff;}
+  .timer.warn{background:var(--accent2);color:#fff;animation:pulse 1s infinite;}
+  @keyframes pulse{50%{opacity:0.6;}}
+  .container{max-width:780px;margin:0 auto;padding:1.5rem 1.2rem 3rem;}
+
+  .chip{font-family:var(--mono);font-size:0.66rem;color:var(--accent);background:#fff;border:1px solid var(--rule);border-radius:20px;padding:0.25rem 0.7rem;cursor:pointer;transition:all .15s;}
+  .chip.active{background:var(--accent);color:#fff;border-color:var(--accent);}
+  .filters{display:flex;gap:0.35rem;flex-wrap:wrap;justify-content:center;margin-bottom:1.2rem;}
+
+  .card{background:#fff;border:1px solid var(--rule);border-radius:8px;padding:1.6rem 1.5rem;}
+  .ptag{font-family:var(--mono);font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--accent);margin-bottom:0.6rem;display:flex;justify-content:space-between;}
+  .ptag .mk{color:var(--gold);}
+  .stem{font-family:var(--serif);font-size:1.2rem;line-height:1.45;margin-bottom:1.2rem;}
+  .opts{display:flex;flex-direction:column;gap:0.55rem;}
+  .opt{text-align:left;font-size:0.97rem;border:1px solid var(--rule);background:#fff;border-radius:5px;padding:0.65rem 0.95rem;cursor:pointer;transition:all .12s;font-family:var(--sans);color:var(--ink);}
+  .opt:hover{border-color:var(--accent);background:var(--accent-light);}
+  .opt:focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
+  .opt.sel{border-color:var(--accent);background:var(--accent-light);font-weight:600;}
+  .opt.correct{border-color:var(--green);background:var(--green-light);color:var(--green);font-weight:600;}
+  .opt.wrong{border-color:var(--accent2);background:var(--accent2-light);color:var(--accent2);}
+  .opt.disabled{pointer-events:none;}
+  .opt code,.stem code,.model code{font-family:var(--mono);font-size:0.88em;background:rgba(0,0,0,0.06);padding:0.05rem 0.25rem;border-radius:2px;}
+  textarea{width:100%;min-height:130px;font-family:var(--sans);font-size:0.95rem;padding:0.8rem;border:1px solid var(--rule);border-radius:6px;resize:vertical;line-height:1.55;}
+  textarea:focus{outline:2px solid var(--accent);border-color:var(--accent);}
+
+  .feedback{margin-top:1rem;font-size:0.9rem;min-height:1.2rem;}
+  .feedback.r{color:var(--green);font-weight:600;}
+  .feedback.w{color:var(--accent2);font-weight:600;}
+  .expl{margin-top:0.5rem;font-size:0.88rem;color:#555;font-style:italic;}
+
+  .controls{display:flex;gap:0.6rem;justify-content:center;margin-top:1.3rem;flex-wrap:wrap;}
+  .btn{font-family:var(--mono);font-size:0.74rem;letter-spacing:0.04em;border:1px solid var(--accent);background:#fff;color:var(--accent);border-radius:4px;padding:0.55rem 1.05rem;cursor:pointer;transition:all .15s;}
+  .btn:hover{background:var(--accent-light);}
+  .btn:focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
+  .btn.primary{background:var(--accent);color:#fff;}
+  .btn.danger{border-color:var(--accent2);color:var(--accent2);}
+  .btn.danger:hover{background:var(--accent2-light);}
+  .btn.flag{border-color:var(--gold);color:var(--gold);}
+  .btn.flag.on{background:var(--gold);color:#fff;}
+
+  /* exam start */
+  .startgrid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin:1rem 0;}
+  @media(max-width:560px){.startgrid{grid-template-columns:1fr;}}
+  .mockcard{border:1px solid var(--rule);border-radius:8px;padding:1.4rem;background:#fff;text-align:center;}
+  .mockcard h3{font-family:var(--serif);font-size:1.3rem;margin-bottom:0.4rem;}
+  .mockcard .meta{font-family:var(--mono);font-size:0.68rem;color:#777;margin-bottom:0.3rem;}
+  .mockcard .best{font-family:var(--mono);font-size:0.68rem;color:var(--green);margin:0.5rem 0 0.9rem;min-height:1rem;}
+
+  /* palette */
+  .palette{display:flex;flex-wrap:wrap;gap:0.3rem;justify-content:center;margin-top:1.2rem;}
+  .pcell{width:30px;height:30px;border:1px solid var(--rule);border-radius:4px;font-family:var(--mono);font-size:0.66rem;background:#fff;color:#888;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+  .pcell.ans{background:var(--accent);color:#fff;border-color:var(--accent);}
+  .pcell.flagged{border-color:var(--gold);border-width:2px;}
+  .pcell.cur{outline:2px solid var(--ink);outline-offset:1px;}
+  .pcell.saq{border-style:dashed;}
+
+  /* results */
+  .scorebig{font-family:var(--serif);font-size:2.4rem;text-align:center;color:var(--accent);}
+  .scoresub{text-align:center;font-family:var(--mono);font-size:0.74rem;color:#777;margin-bottom:1.2rem;}
+  .partbar{display:flex;align-items:center;gap:0.6rem;margin:0.35rem 0;font-family:var(--mono);font-size:0.7rem;}
+  .partbar .pl{width:130px;color:#555;}
+  .partbar .bar{flex:1;height:8px;background:var(--rule);border-radius:4px;overflow:hidden;}
+  .partbar .bar>i{display:block;height:100%;background:var(--green);}
+  .partbar .pv{width:54px;text-align:right;color:#555;}
+  .review{margin-top:1.4rem;}
+  .rev-item{border:1px solid var(--rule);border-radius:6px;padding:1rem 1.1rem;margin-bottom:0.8rem;background:#fff;}
+  .rev-item .rq{font-family:var(--serif);font-size:1.02rem;margin-bottom:0.5rem;}
+  .rev-tag{font-family:var(--mono);font-size:0.58rem;letter-spacing:0.1em;text-transform:uppercase;padding:0.1rem 0.4rem;border-radius:2px;}
+  .rev-tag.ok{background:var(--green-light);color:var(--green);}
+  .rev-tag.no{background:var(--accent2-light);color:var(--accent2);}
+  .rev-tag.self{background:var(--violet-light);color:var(--violet);}
+  .yours{font-size:0.9rem;margin:0.4rem 0;padding:0.5rem 0.7rem;background:#faf9f7;border-left:3px solid var(--rule);border-radius:3px;}
+  .model{font-size:0.9rem;margin:0.4rem 0;padding:0.6rem 0.8rem;background:var(--gold-light);border-left:3px solid var(--gold);border-radius:3px;}
+  .model .ml{font-family:var(--mono);font-size:0.58rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gold);margin-bottom:0.25rem;}
+  .selfmark{display:flex;gap:0.4rem;margin-top:0.5rem;align-items:center;flex-wrap:wrap;}
+  .selfmark .lbl{font-family:var(--mono);font-size:0.62rem;color:#777;}
+  .sm{font-family:var(--mono);font-size:0.66rem;border:1px solid var(--rule);background:#fff;border-radius:4px;padding:0.3rem 0.6rem;cursor:pointer;}
+  .sm.on{background:var(--green);color:#fff;border-color:var(--green);}
+
+  footer{margin-top:2.5rem;padding:1.6rem;border-top:3px solid var(--ink);text-align:center;font-family:var(--mono);font-size:0.68rem;color:#999;}
+  footer .brand{color:var(--accent);}
+  .note{font-size:0.85rem;color:#666;background:var(--accent-light);border-left:3px solid var(--accent);border-radius:4px;padding:0.7rem 0.9rem;margin:0.8rem 0;}
+</style>
+</head>
+<body>
+<div class="masthead">
+  <div class="eyebrow">M.Sc. Programme &middot; CSC830 Artificial Intelligence</div>
+  <h1>Quiz &amp; Exam Hub</h1>
+</div>
+<nav>
+  <button class="modebtn active" id="m-prac" onclick="setMode('practice')">PRACTICE QUIZ</button>
+  <button class="modebtn" id="m-exam" onclick="setMode('examselect')">EXAM MODE</button>
+  <span class="timer" id="timer" style="display:none">53:20</span>
+</nav>
+<div class="container" id="root"></div>
+<footer>
+  CSC830 &middot; Artificial Intelligence &middot; Department of Computer Science, Faculty of Computing &middot; Nile University of Nigeria<br>
+  Quiz &amp; Exam Hub &middot; Presented by <span class="brand">Leternal Systems</span>
+</footer>
+
+<script>
+const DATA = {"mocks": {"1": [{"t": "MCQ", "p": "A", "stem": "Which of the following is <em>not<\/em> one of the four capabilities a machine must combine to pass the Turing Test?", "opts": ["Natural language processing", "Knowledge representation", "Automated reasoning", "Numerical optimisation"], "ci": 3, "expl": "The four are NLP, knowledge representation, automated reasoning, and machine learning. Numerical optimisation is not on the list."}, {"t": "MCQ", "p": "A", "stem": "Russell &amp; Norvig's matrix classifies definitions of AI along two axes. They are:", "opts": ["Hardware vs. software, and speed vs. accuracy", "Thought/reasoning vs. behaviour, and human fidelity vs. ideal rationality", "Strong vs. weak, and narrow vs. general", "Supervised vs. unsupervised, and online vs. offline"], "ci": 1, "expl": "The axes are reasoning vs. behaviour and fidelity-to-humans vs. an ideal standard of rationality."}, {"t": "MCQ", "p": "A", "stem": "The Chinese Room argument concludes that a Turing-Test-passing system has:", "opts": ["Semantics but not syntax", "Syntax but not semantics", "Both syntax and semantics", "Neither syntax nor semantics"], "ci": 1, "expl": "Searle argues the room manipulates symbols (syntax) with no understanding (semantics)."}, {"t": "MCQ", "p": "A", "stem": "Which Hintze type best describes today's self-driving cars?", "opts": ["Reactive machines", "Limited memory", "Theory of mind", "Self-awareness"], "ci": 1, "expl": "Limited-memory systems use recent experience; this is the current leading edge."}, {"t": "SAQ", "p": "A", "stem": "Explain the Turing Test as a definition of intelligence, and name the four capabilities a machine must combine to pass it.", "marks": 5, "model": "The Turing Test (Turing's 'imitation game') defines a machine as acting humanly if a human interrogator, communicating only over a text channel, cannot reliably distinguish it from a human. It tests behaviour rather than internal mechanism. To pass, a system must combine four capabilities: (1) natural language processing to communicate; (2) knowledge representation to store what it knows; (3) automated reasoning to answer questions and draw conclusions; and (4) machine learning to adapt to new circumstances and detect patterns."}, {"t": "MCQ", "p": "B", "stem": "The time and space complexity of breadth-first search is:", "opts": ["O(b&middot;m)", "O(b<sup>d/2<\/sup>)", "O(b<sup>d+1<\/sup>)", "O(m)"], "ci": 2, "expl": "BFS is exponential in both time and space: O(b<sup>d+1<\/sup>)."}, {"t": "MCQ", "p": "B", "stem": "Which uninformed strategy is guaranteed to return the least-cost solution when step costs vary?", "opts": ["Breadth-first search", "Depth-first search", "Uniform-cost search", "Iterative deepening search"], "ci": 2, "expl": "UCS expands the lowest path-cost node first, so the first goal reached is least-cost."}, {"t": "MCQ", "p": "B", "stem": "Depth-first search is preferred over breadth-first search chiefly because of its:", "opts": ["Optimality", "Completeness", "Linear O(b&middot;m) space", "Guaranteed shortest path"], "ci": 2, "expl": "DFS needs only O(b&middot;m) memory, the decisive advantage on large problems."}, {"t": "MCQ", "p": "B", "stem": "Bidirectional search reduces time and space to:", "opts": ["O(b<sup>d<\/sup>)", "O(b<sup>d/2<\/sup>)", "O(b&middot;d)", "O(d<sup>2<\/sup>)"], "ci": 1, "expl": "Searching from both ends meets in the middle, giving O(b<sup>d/2<\/sup>)."}, {"t": "SAQ", "p": "B", "stem": "Compare breadth-first and depth-first search on completeness, optimality, and space complexity, and state one situation where DFS is the better choice.", "marks": 7.5, "model": "BFS adds children to the end of the open list (FIFO), searching level by level: it is complete and finds the shallowest solution, but is not optimal unless all step costs are equal, and its space cost is O(b<sup>d+1<\/sup>) &mdash; exponential. DFS adds children to the front (LIFO), plunging down one path before backtracking: it is not complete (it can descend an infinite branch) and not optimal, but its space cost is only O(b&middot;m), linear in depth. DFS is the better choice when memory is the binding constraint and the search tree is large but solutions are plentiful or deep &mdash; e.g. very large state spaces where BFS would exhaust memory."}, {"t": "MCQ", "p": "C", "stem": "A* orders its open list by the function:", "opts": ["f(n) = h(n)", "f(n) = g(n)", "f(n) = g(n) + h(n)", "f(n) = g(n) &minus; h(n)"], "ci": 2, "expl": "A* combines cost-so-far g(n) and estimated cost-to-go h(n)."}, {"t": "MCQ", "p": "C", "stem": "A heuristic h(n) is <em>admissible<\/em> if it:", "opts": ["Never underestimates the true cost to the goal", "Never overestimates the true cost to the goal", "Always equals the true cost", "Is computed in constant time"], "ci": 1, "expl": "Admissibility = never overestimating; it is what guarantees A* optimality."}, {"t": "MCQ", "p": "C", "stem": "Setting the beam width n = 1 makes beam search equivalent to:", "opts": ["Best-first search", "Hill climbing", "A*", "Uniform-cost search"], "ci": 1, "expl": "Width 1 keeps only the single best node &mdash; that is hill climbing; width &infin; is best-first."}, {"t": "MCQ", "p": "C", "stem": "Which memory-bounded algorithm uses an f-cost threshold instead of a depth threshold?", "opts": ["RBFS", "SMA*", "IDA*", "Beam search"], "ci": 2, "expl": "IDA* is iterative deepening on f-cost; its space is O(m)."}, {"t": "SAQ", "p": "C", "stem": "State A*'s evaluation function and explain why an admissible heuristic guarantees an optimal solution.", "marks": 7.5, "model": "A* expands nodes in order of f(n) = g(n) + h(n), where g is the known cost from the start and h is an estimate of the remaining cost. With an admissible h (one that never overestimates), optimality follows: suppose a suboptimal goal G&#8322; is on the open list and n is an unexpanded node on the optimal path to G&#8321;. Then f(G&#8322;) = g(G&#8322;) (since h(G&#8322;)=0) &ge; g(G&#8321;) (G&#8322; is suboptimal) &ge; f(n) (h is admissible). Because f(G&#8322;) &gt; f(n), A* always expands n before G&#8322;, so it never returns the suboptimal goal."}, {"t": "MCQ", "p": "D", "stem": "In a genetic algorithm, a chromosome represents:", "opts": ["A single attribute", "A candidate solution", "The fitness value", "The crossover point"], "ci": 1, "expl": "A chromosome is a whole candidate solution (usually a binary string); a gene is a single attribute."}, {"t": "MCQ", "p": "D", "stem": "Simulated annealing accepts a worse (uphill) move with a probability that depends on:", "opts": ["The beam width", "How much worse the move is and the current temperature", "The mutation rate alone", "Nothing &mdash; it never accepts worse moves"], "ci": 1, "expl": "Worse moves are accepted probabilistically, more freely at high temperature; the schedule cools over time."}, {"t": "MCQ", "p": "D", "stem": "The Hamming distance between 011010 and 110011 is:", "opts": ["2", "3", "4", "5"], "ci": 1, "expl": "Positions 1, 3 and 6 differ &rarr; distance 3."}, {"t": "SAQ", "p": "D", "stem": "Describe the three core operators of a genetic algorithm and the distinct role each plays.", "marks": 5, "model": "Reproduction (selection) chooses individuals in proportion to fitness &mdash; the fitter survive and mate &mdash; commonly via a biased roulette wheel; it focuses the search on good solutions. Crossover takes two parents and a cross site and cuts-and-splices their segments, recombining existing building blocks to explore new combinations; it is the primary search operator. Mutation flips a bit at random with small probability, introducing genuinely new material; it is a minor operator that maintains diversity and lets the search escape local optima."}, {"t": "MCQ", "p": "E", "stem": "KB &#8872; &alpha; (KB entails &alpha;) means &alpha; is true:", "opts": ["In at least one model where KB is true", "In all models where KB is true", "Only in the real world", "In all models, regardless of KB"], "ci": 1, "expl": "Entailment: &alpha; holds in every model in which KB holds."}, {"t": "MCQ", "p": "E", "stem": "Which logic has the epistemological commitment 'a value in [0,1]'?", "opts": ["Propositional logic", "First-order logic", "Probability theory", "Temporal logic"], "ci": 2, "expl": "Probability theory commits to a degree of belief in [0,1]; propositional/first-order/temporal use true/false/unknown."}, {"t": "MCQ", "p": "E", "stem": "From &lsquo;Tuesday or Thursday&rsquo; and &lsquo;not Thursday&rsquo;, concluding &lsquo;Tuesday&rsquo; uses:", "opts": ["And-elimination", "Unit resolution", "Or-introduction", "Double-negation"], "ci": 1, "expl": "&alpha;&or;&beta; with &not;&beta; yields &alpha; &mdash; unit resolution."}, {"t": "MCQ", "p": "E", "stem": "First-order predicate calculus adds which of these over propositional logic?", "opts": ["Truth tables", "Objects, relations and quantifiers", "Boolean connectives", "Modus ponens"], "ci": 1, "expl": "FOPC introduces objects, relations, and the quantifiers &forall; and &exist;."}, {"t": "SAQ", "p": "E", "stem": "Define entailment and explain how model checking establishes it, illustrating with the Wumpus world.", "marks": 5, "model": "A knowledge base KB entails a sentence &alpha; (KB &#8872; &alpha;) if and only if &alpha; is true in every model in which KB is true. Model checking establishes entailment by enumerating all possible models (worlds) consistent with the percepts and confirming &alpha; holds in each one where KB holds. In the Wumpus world, after sensing no breeze in [1,1] and a breeze in [2,1] there are three unknown pit-squares and so 2&sup3; = 8 candidate models. Checking each, square [1,2] contains no pit in every model where KB is true; therefore KB &#8872; &lsquo;[1,2] is safe&rsquo;, proven by model checking."}, {"t": "MCQ", "p": "F", "stem": "A resolution refutation proof succeeds exactly when it derives:", "opts": ["A tautology", "The empty clause", "A unit clause", "The goal as a literal"], "ci": 1, "expl": "Deriving the empty clause [] is the contradiction that completes a refutation."}, {"t": "MCQ", "p": "F", "stem": "Two expressions are unifiable if and only if there exists:", "opts": ["A common constant", "A substitution (binding list) making them identical", "A shared predicate name", "An empty clause"], "ci": 1, "expl": "Unification needs a substitution that makes the expressions identical."}, {"t": "MCQ", "p": "F", "stem": "Why is a unit clause preferred as a parent in resolution?", "opts": ["It is always true", "Resolving with it yields a smaller resolvent", "It avoids the occurs check", "It is the negated goal"], "ci": 1, "expl": "A unit (one literal) produces shorter resolvents, driving toward the 0-literal empty clause faster."}, {"t": "SAQ", "p": "F", "stem": "Outline the steps of a resolution refutation proof and explain why the goal must be negated.", "marks": 7.5, "model": "Resolution refutation proceeds in three steps: (1) convert the knowledge base to clausal (conjunctive normal) form; (2) negate the goal to be proved and add it to the clause set; (3) repeatedly resolve pairs of clauses that contain complementary literals (unifying variables where necessary) until the empty clause [] is derived. The goal is negated because resolution is a refutation procedure: to show KB &#8872; g we assume the opposite (&not;g) and show that KB &cup; {&not;g} is unsatisfiable. Deriving the empty clause exposes that contradiction, which proves the original goal. Forgetting to negate the goal is the most common error and makes the proof fail."}, {"t": "MCQ", "p": "G", "stem": "A model with 99% training accuracy but 65% test accuracy is exhibiting:", "opts": ["High bias / underfitting", "High variance / overfitting", "Irreducible error", "Perfect generalisation"], "ci": 1, "expl": "Great on train, poor on test = high variance / overfitting."}, {"t": "MCQ", "p": "G", "stem": "Classification accuracy equals:", "opts": ["TP / (TP+FP)", "(TP+TN) / (TP+FP+TN+FN)", "TP / (TP+FN)", "(FP+FN) / total"], "ci": 1, "expl": "Accuracy is the fraction of correct predictions over all predictions."}, {"t": "MCQ", "p": "G", "stem": "The No Free Lunch theorem implies that:", "opts": ["Neural networks always win", "Averaged over all problems, no learner is universally best", "Accuracy is free of cost", "More data always helps"], "ci": 1, "expl": "Averaged over all problems every learner performs equally; pick empirically."}, {"t": "SAQ", "p": "G", "stem": "Distinguish supervised from unsupervised learning, giving one concrete example of each.", "marks": 5, "model": "Supervised learning trains on labelled data: each example pairs an input X with a known correct output Y, and the goal is to learn a mapping f(X)&rarr;Y &mdash; e.g. predicting a house price from its size and location. Unsupervised learning trains on unlabelled data with no target output; the goal is to discover hidden structure &mdash; e.g. clustering customers into segments by purchasing behaviour, where the groups emerge automatically. The key difference is the presence (supervised) or absence (unsupervised) of labels."}, {"t": "MCQ", "p": "H", "stem": "The linear-regression cost function J(&theta;) measures:", "opts": ["The slope of the line", "Half the mean of the squared errors", "The learning rate", "The gradient of &theta;"], "ci": 1, "expl": "J(&theta;) = (1/2m)&sum;(h&minus;y)&sup2; &mdash; half-mean squared error."}, {"t": "MCQ", "p": "H", "stem": "A large value of C in a support vector machine tends to:", "opts": ["Increase regularisation", "Risk over-fitting by weighting the data term heavily", "Always widen the margin", "Ignore the training data"], "ci": 1, "expl": "Large C (small &lambda;) prioritises fitting the data and can over-fit."}, {"t": "MCQ", "p": "H", "stem": "Why can a single sigmoid unit not represent the XNOR function?", "opts": ["It has too many weights", "XNOR is not linearly separable", "Sigmoid cannot output 1", "XNOR needs three inputs"], "ci": 1, "expl": "XNOR is not linearly separable, so a hidden layer is required."}, {"t": "SAQ", "p": "H", "stem": "Explain gradient descent for linear regression: the update rule, the role of the learning rate &alpha;, and what 'simultaneous update' means.", "marks": 5, "model": "Gradient descent minimises the cost J(&theta;) by repeatedly stepping each parameter against the slope of J: &theta;<sub>j<\/sub> := &theta;<sub>j<\/sub> &minus; &alpha; &part;J/&part;&theta;<sub>j<\/sub>. For linear regression this becomes &theta;<sub>0<\/sub> := &theta;<sub>0<\/sub> &minus; &alpha;(1/m)&sum;(h&minus;y) and &theta;<sub>1<\/sub> := &theta;<sub>1<\/sub> &minus; &alpha;(1/m)&sum;(h&minus;y)x. The learning rate &alpha; sets the step size: too small and convergence is very slow, too large and the algorithm can overshoot and diverge. 'Simultaneous update' means all temporary new values are computed from the current &theta; first, and only then assigned together &mdash; updating &theta;<sub>0<\/sub> before computing &theta;<sub>1<\/sub> would corrupt the gradient. Because the squared-error surface is convex, gradient descent converges to the global minimum."}, {"t": "MCQ", "p": "I", "stem": "The vanishing-gradient problem in deep networks is best mitigated by which activation?", "opts": ["Sigmoid", "Tanh", "ReLU", "Linear"], "ci": 2, "expl": "ReLU's gradient does not saturate for positive inputs, easing vanishing gradients."}, {"t": "MCQ", "p": "I", "stem": "An LSTM regulates its memory cell with three gates:", "opts": ["Read, write, erase", "Input, forget, output", "Encode, decode, attend", "Open, close, reset"], "ci": 1, "expl": "The input, forget and output gates control information flow in an LSTM."}, {"t": "SAQ", "p": "I", "stem": "State the Universal Approximation Theorem and explain why it is described as 'existential, not constructive'.", "marks": 5, "model": "The Universal Approximation Theorem states that a feed-forward network with at least one hidden layer of finitely many neurons and a suitable activation (e.g. sigmoid or ReLU) can approximate any continuous function on a compact subset of &#8477;<sup>n<\/sup> to any desired accuracy, given enough neurons. It is 'existential, not constructive' because it only guarantees that such a network <em>exists<\/em>; it gives no method to find the required weights and says nothing about how many neurons are needed or whether the network can be trained efficiently. In practice, optimisation difficulty, overfitting and generalisation remain real obstacles despite the theorem."}, {"t": "SAQ", "p": "I", "stem": "Compare the sigmoid, ReLU and Leaky/Parametric ReLU activation functions, stating one advantage and one disadvantage of each.", "marks": 7.5, "model": "Sigmoid, g(z)=1/(1+e&#8315;&#7611;), gives a smooth 0&ndash;1 output that reads naturally as a probability (advantage), but it saturates for large |z|, causing the vanishing-gradient problem in deep networks, and its output is not zero-centred (disadvantages). ReLU, g(z)=max(0,z), is cheap to compute and does not saturate for positive inputs, largely solving the vanishing-gradient problem (advantage); however, a unit whose input is always negative has zero gradient and stops learning &mdash; the 'dead neuron' problem &mdash; and its output is not zero-centred (disadvantages). Leaky/Parametric ReLU adds a small non-zero slope for negative inputs, which keeps ReLU's benefits while preventing dead neurons (advantage), at the cost of an extra parameter or hyper-parameter to set (disadvantage)."}], "2": [{"t": "MCQ", "p": "A", "stem": "Which approach to AI did Russell &amp; Norvig adopt as their organising principle?", "opts": ["Thinking humanly", "Thinking rationally", "Acting humanly", "Acting rationally"], "ci": 3, "expl": "They adopt the rational-agent view: acting rationally to maximise expected goal achievement."}, {"t": "MCQ", "p": "A", "stem": "Computer-science-based AI is generally dated to:", "opts": ["Turing's 1950 paper", "The Dartmouth Conference, 1956", "The first AI winter", "Deep Blue, 1997"], "ci": 1, "expl": "The 1956 Dartmouth Conference is the conventional birth of the field."}, {"t": "MCQ", "p": "A", "stem": "Which tribe of machine learning is associated with back-propagation?", "opts": ["Symbolists", "Connectionists", "Bayesians", "Analogizers"], "ci": 1, "expl": "Connectionists (neuroscience origin) use back-propagation; Evolutionaries use genetic programming."}, {"t": "MCQ", "p": "A", "stem": "An 'AI winter' refers to:", "opts": ["A hardware failure", "A period of sharply reduced AI funding after unmet expectations", "A type of neural network", "A benchmark dataset"], "ci": 1, "expl": "Inflated promises &rarr; disappointment &rarr; criticism &rarr; funding collapse."}, {"t": "SAQ", "p": "A", "stem": "Distinguish strong (general) AI from weak (narrow) AI, and name Hintze's four types of AI in order of sophistication.", "marks": 5, "model": "Strong (general) AI would adapt intelligently across many different situations, like a human; weak (narrow) AI is engineered to perform one specific task well and cannot act outside it. Today's systems are all narrow. Hintze's four types, in increasing sophistication, are: (1) reactive machines &mdash; no memory, respond only to the current input; (2) limited memory &mdash; use recent experience, the current state of the art (e.g. self-driving cars); (3) theory of mind &mdash; model the goals and beliefs of other agents, only partly feasible today; and (4) self-awareness &mdash; possessing consciousness and a sense of self, not currently possible."}, {"t": "MCQ", "p": "B", "stem": "Depth-first search behaves like which data structure?", "opts": ["A FIFO queue", "A LIFO stack", "A priority queue", "A hash table"], "ci": 1, "expl": "DFS adds children to the front of the open list &mdash; a LIFO stack."}, {"t": "MCQ", "p": "B", "stem": "A search problem is fully specified by which four components?", "opts": ["State, action, reward, policy", "Initial state, operators, goal test, solution cost", "Nodes, edges, weights, root", "Population, fitness, crossover, mutation"], "ci": 1, "expl": "Initial state, operators (actions), goal test, and an additive solution cost."}, {"t": "MCQ", "p": "B", "stem": "Iterative deepening search is attractive because it combines:", "opts": ["BFS optimality with DFS speed", "DFS's linear space with BFS's completeness and shortest solution", "UCS optimality with bidirectional speed", "A*'s heuristic with DFS memory"], "ci": 1, "expl": "IDS gets O(b&middot;d) space yet remains complete and finds the shallowest goal."}, {"t": "SAQ", "p": "B", "stem": "List the six axes used to characterise a task environment, and classify the classic route-finding problem on each.", "marks": 5, "model": "The six axes are: static or dynamic; fully or partially observable; discrete or continuous; deterministic or stochastic; episodic or sequential; and single-agent or multi-agent. The classic route-finding (e.g. Romania map) problem is static (the map does not change while planning), fully observable (the whole map is known), discrete (finitely many cities), deterministic (an action's outcome is certain), sequential (earlier moves affect later ones), and single-agent (no adversary)."}, {"t": "MCQ", "p": "C", "stem": "Among admissible heuristics, the best ones are those that produce:", "opts": ["Lower h-values", "Higher h-values (closer to true cost)", "Constant h-values", "Random h-values"], "ci": 1, "expl": "A higher admissible estimate is closer to the true cost, so fewer nodes are expanded (dominance)."}, {"t": "MCQ", "p": "C", "stem": "For A*, which kind of heuristic error is more damaging?", "opts": ["Underestimating", "Overestimating", "Both equally", "Neither matters"], "ci": 1, "expl": "Overestimating can break admissibility and steer A* past the optimal goal."}, {"t": "MCQ", "p": "C", "stem": "SMA*, on running out of memory, will:", "opts": ["Restart from scratch", "Drop the worst (highest-f) leaf and back up its value", "Switch to DFS", "Double the memory"], "ci": 1, "expl": "SMA* forgets the worst leaf but records its best f at the parent for possible regeneration."}, {"t": "MCQ", "p": "C", "stem": "A standard way to derive an admissible heuristic is to:", "opts": ["Use a random value", "Solve a relaxed version of the problem", "Multiply the true cost by 2", "Use the branching factor"], "ci": 1, "expl": "The optimal cost of a relaxed problem is an admissible heuristic for the original."}, {"t": "SAQ", "p": "C", "stem": "Define heuristic 'dominance' (informedness) and explain its effect on search cost, with an illustrative example.", "marks": 7.5, "model": "Given two admissible heuristics h&#8321; and h&#8322;, h&#8322; dominates h&#8321; (is more informed) if h&#8322;(n) &ge; h&#8321;(n) for every node n. A dominating heuristic never expands more nodes than the one it dominates, because its higher (still non-overestimating) values mean fewer nodes satisfy f(n) &lt; f*(goal) and so fewer are needlessly expanded &mdash; reducing both time and space. For the 8-puzzle at depth 24, A* with h&#8321; = 'tiles out of place' expands about 39,135 nodes, whereas A* with the dominating h&#8322; = 'Manhattan distance' expands only about 1,641."}, {"t": "MCQ", "p": "D", "stem": "Which GA refinement copies the best chromosomes unchanged into the next generation?", "opts": ["Inversion", "Elitism", "Mutation", "Crossover"], "ci": 1, "expl": "Elitism preserves the top-k individuals so the best solution is never lost."}, {"t": "MCQ", "p": "D", "stem": "The inversion operator works by:", "opts": ["Flipping every bit", "Reversing the order of a chromosome segment", "Selecting two parents", "Sizing the roulette wheel"], "ci": 1, "expl": "Inversion reverses a segment, preserving building blocks and improving gene ordering."}, {"t": "MCQ", "p": "D", "stem": "Local beam search risks failing because:", "opts": ["It uses too little memory", "Its k states can collapse onto the same hill", "It never accepts worse moves", "It has no fitness function"], "ci": 1, "expl": "The k states tend to cluster; choosing successors stochastically counters this."}, {"t": "SAQ", "p": "D", "stem": "Explain simulated annealing: how it differs from plain hill climbing and the condition under which it is guaranteed to find the global optimum.", "marks": 5, "model": "Simulated annealing is a compromise between hill climbing (efficient but incomplete) and random search (complete but inefficient), inspired by cooling a metal slowly to a low-energy state. Like hill climbing it considers a random neighbour, and always accepts it if it improves the objective; unlike hill climbing, if the neighbour is worse it is still accepted with a probability that depends on how much worse it is and on a controlling 'temperature'. At high temperature many worse moves are accepted, letting the search escape local optima; as the temperature is gradually lowered, such moves become rare and the search settles. If the temperature is decreased slowly enough, simulated annealing is guaranteed to reach the global optimum."}, {"t": "MCQ", "p": "E", "stem": "One row of a propositional truth table corresponds to:", "opts": ["A proof", "One interpretation (model)", "An inference rule", "A clause"], "ci": 1, "expl": "Each row fixes truth values for all propositions &mdash; one model."}, {"t": "MCQ", "p": "E", "stem": "That propositional logic is 'monotonic' means:", "opts": ["Conclusions can be retracted as facts are added", "Entailed sentences are preserved as knowledge is added", "Every sentence is true", "It has only one model"], "ci": 1, "expl": "Adding knowledge never withdraws previously entailed conclusions."}, {"t": "MCQ", "p": "E", "stem": "The ontological commitment of first-order logic is:", "opts": ["Facts only", "Facts, objects and relations", "Degrees of truth", "Times and events only"], "ci": 1, "expl": "FOL commits to facts, objects and relations (temporal logic adds times)."}, {"t": "MCQ", "p": "E", "stem": "Inference treated purely as search using And-introduction, Universal Elimination and Modus Ponens suffers from:", "opts": ["Unsoundness", "A huge branching factor", "Incompleteness of modus ponens", "Lack of a goal test"], "ci": 1, "expl": "These rules generate enormous branching, motivating resolution as a single powerful rule."}, {"t": "SAQ", "p": "E", "stem": "Using the rule '&forall;x,y [Parent(x,y) &rarr; Older(x,y)]', '&forall;x,y [Mother(x,y) &rarr; Parent(x,y)]' and 'Mother(Lulu, Fifi)', prove Older(Lulu, Fifi). Name the inference steps used.", "marks": 5, "model": "From premise 2, &forall;x,y [Mother(x,y) &rarr; Parent(x,y)], apply Universal Elimination binding x=Lulu, y=Fifi to get Mother(Lulu,Fifi) &rarr; Parent(Lulu,Fifi). Combining this with the fact Mother(Lulu,Fifi) by Modus Ponens gives Parent(Lulu,Fifi). From premise 1, &forall;x,y [Parent(x,y) &rarr; Older(x,y)], apply Universal Elimination (x=Lulu, y=Fifi) to get Parent(Lulu,Fifi) &rarr; Older(Lulu,Fifi); combining with the derived Parent(Lulu,Fifi) by Modus Ponens yields Older(Lulu,Fifi). The steps used are Universal Elimination (binding variables to constants) and Modus Ponens."}, {"t": "MCQ", "p": "F", "stem": "The most general unifier (MGU) is preferred because it is:", "opts": ["The fastest to compute", "The least-constraining substitution, applicable to more cases", "Always a constant binding", "Unique to constants"], "ci": 1, "expl": "The MGU keeps results as general as possible, so they apply more widely."}, {"t": "MCQ", "p": "F", "stem": "R(?x) and R(F(?x)) fail to unify because of:", "opts": ["A type mismatch", "The occurs check (?x appears inside F(?x))", "Too many arguments", "An empty binding list"], "ci": 1, "expl": "Binding ?x to a term containing ?x is disallowed by the occurs check."}, {"t": "MCQ", "p": "F", "stem": "Which classic program used pattern unification to imitate a Rogerian psychiatrist?", "opts": ["PARRY", "ELIZA", "SHRDLU", "Deep Blue"], "ci": 1, "expl": "ELIZA matched input against rule patterns; PARRY simulated a paranoid patient."}, {"t": "SAQ", "p": "F", "stem": "Define unification and state the three valid types of substitution, noting the restriction that applies to one of them.", "marks": 5, "model": "Unification is the process of finding a substitution (a binding list) that, when applied to two expressions, makes them identical; two expressions are unifiable exactly when such a substitution exists, and the algorithm returns the most general unifier. The three valid substitution types are: variable&rarr;constant (bind a variable to a constant), variable&rarr;variable (bind one variable to another), and variable&rarr;function (bind a variable to a functional term) &mdash; the last subject to the occurs check, which forbids binding a variable to a term that contains that same variable (so ?x cannot be bound to F(?x))."}, {"t": "MCQ", "p": "G", "stem": "Tom Mitchell's definition frames learning in terms of which three elements?", "opts": ["Input, hidden, output", "Task T, performance measure P, experience E", "Bias, variance, noise", "Train, validate, test"], "ci": 1, "expl": "A program learns from E w.r.t. T and P if performance at T (by P) improves with E."}, {"t": "MCQ", "p": "G", "stem": "Expected prediction error decomposes into:", "opts": ["Bias + Variance only", "Bias&sup2; + Variance + Irreducible Error", "Precision + Recall", "Accuracy + Error"], "ci": 1, "expl": "The standard decomposition is Bias&sup2; + Variance + Irreducible Error."}, {"t": "MCQ", "p": "G", "stem": "A false negative (FN) is a case that is:", "opts": ["Actually negative, predicted positive", "Actually positive, predicted negative", "Correctly classified", "Excluded from the test set"], "ci": 1, "expl": "FN = actual positive predicted as negative."}, {"t": "SAQ", "p": "G", "stem": "Explain the bias&ndash;variance tradeoff, relating high bias to underfitting and high variance to overfitting, and give one remedy for overfitting.", "marks": 5, "model": "Bias is error from overly simple assumptions: a high-bias model misses real structure and underfits, performing poorly on both training and test data (e.g. fitting a straight line to clearly curved data). Variance is sensitivity to the particular training set: a high-variance model fits noise and overfits, performing very well on training data but poorly on unseen test data. The tradeoff is that reducing one tends to raise the other, and total expected error is Bias&sup2; + Variance + irreducible error, so the aim is the balance that minimises test error. Remedies for overfitting (high variance) include gathering more data, applying regularisation, using a simpler model, or cross-validation."}, {"t": "MCQ", "p": "H", "stem": "Multi-class classification labels are typically encoded as:", "opts": ["A single integer scaled to [0,1]", "One-hot vectors", "Binary fractions", "Negative numbers"], "ci": 1, "expl": "A one-hot vector places a 1 in the position of the true class."}, {"t": "MCQ", "p": "H", "stem": "In back-propagation, which layer has no error (&delta;) term?", "opts": ["The output layer", "A hidden layer", "The input layer", "The bias unit only"], "ci": 2, "expl": "The input layer carries the given features, so it has no error term."}, {"t": "MCQ", "p": "H", "stem": "A support vector machine is also known as a:", "opts": ["Maximum-likelihood classifier", "Large-margin classifier", "Nearest-neighbour classifier", "Naive Bayes classifier"], "ci": 1, "expl": "The SVM finds the widest-margin separating boundary."}, {"t": "SAQ", "p": "H", "stem": "Describe how a neural network performs forward propagation and explain why the output layer is said to use 'learned features' rather than the raw inputs.", "marks": 5, "model": "Forward propagation computes the network's output layer by layer. Starting from the input features X (with a bias unit added), each unit in the next layer applies an activation g &mdash; typically the sigmoid g(z) = 1/(1+e&#8315;&#7611;) &mdash; to a weighted sum of the previous layer's outputs, producing that layer's activations a; a bias unit is prepended and the process repeats until the output h<sub>&theta;<\/sub>(x) is produced. The output layer is said to use 'learned features' because it does not act on the raw inputs X directly &mdash; it acts on the activations a of the last hidden layer, which are non-linear combinations of X that the network has learned through its weights. In effect the hidden layers learn their own representation of the input, and the final layer classifies using that representation."}, {"t": "MCQ", "p": "I", "stem": "A convolutional layer's key efficiency over a fully connected layer comes from:", "opts": ["Using more parameters", "Parameter sharing &mdash; reusing one filter across the image", "Removing the activation function", "Skipping the bias term"], "ci": 1, "expl": "The same small filter slides across the whole image, drastically cutting parameters."}, {"t": "MCQ", "p": "I", "stem": "A generative adversarial network (GAN) consists of:", "opts": ["An encoder and a decoder", "A generator and a discriminator", "Two identical CNNs", "A teacher and a student dataset"], "ci": 1, "expl": "A generator synthesises data while a discriminator tries to tell real from fake."}, {"t": "MCQ", "p": "I", "stem": "The 'dead neuron' problem is a disadvantage of which activation?", "opts": ["Sigmoid", "Tanh", "ReLU", "Softmax"], "ci": 2, "expl": "A ReLU whose input is always negative has zero gradient and stops updating &mdash; a dead neuron; Leaky/Parametric ReLU fixes this."}, {"t": "SAQ", "p": "I", "stem": "Explain the convolution operation in a CNN, including the roles of the filter, stride and zero padding, and state two benefits of convolution over a fully connected layer.", "marks": 7.5, "model": "In a convolutional layer a small filter (kernel), e.g. 3&times;3, slides spatially across the input image. At each position it performs an element-wise multiplication with the overlapped pixels and sums the products into a single value of a new matrix called the feature map. The stride is the number of pixels the filter shifts at each step &mdash; a larger stride produces a smaller output; zero padding adds a border of zeros around the image so the filter can cover the edges and the feature map does not shrink too quickly. Two benefits over a fully connected layer are: (1) parameter sharing &mdash; the same filter weights are reused at every position, drastically reducing the number of parameters; and (2) locality &mdash; small filters focus on local patches, capturing local spatial patterns such as edges. Pooling layers then reduce spatial size while keeping the important features."}, {"t": "SAQ", "p": "B", "stem": "Define a 'research problem'-style search problem by listing the four components of problem formulation, then apply them to the 8-puzzle.", "marks": 5, "model": "A search problem is fully specified by four components: (1) the initial state &mdash; the configuration the agent starts in; (2) the operators (actions) &mdash; functions mapping one state to another; (3) the goal test &mdash; the condition a state must meet to count as a solution; and (4) the solution cost &mdash; an additive path cost summed over the operators applied. For the 8-puzzle: the initial state is a specific arrangement of the eight numbered tiles and the blank; the operators move the blank left, right, up or down; the goal test checks that the tiles are ordered 1&ndash;8 around the frame; and the path cost is 1 per move, so the solution cost equals the number of moves."}]}, "parts": {"A": "Foundations", "B": "Uninformed Search", "C": "Informed Search", "D": "Local Search & GA", "E": "KR & Logic", "F": "Logical Reasoning", "G": "ML Basics", "H": "ML Algorithms", "I": "Deep Learning"}, "secs": 80};
+
+const LS_BEST='csc830_hub_best';
+const root=document.getElementById('root');
+const timerEl=document.getElementById('timer');
+let mode='practice';
+
+/* ---------- PRACTICE ---------- */
+let pracPool=[], pracFilter='ALL', pracIdx=0, pracScore={c:0,t:0}, pracAnswered=false;
+function allMCQ(){ let a=[]; for(const m of ['1','2']) DATA.mocks[m].forEach(q=>{if(q.t==='MCQ')a.push(q);}); return a; }
+function buildPrac(){
+  pracPool=allMCQ().filter(q=>pracFilter==='ALL'||q.p===pracFilter);
+  for(let i=pracPool.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[pracPool[i],pracPool[j]]=[pracPool[j],pracPool[i]];}
+  pracIdx=0;
+}
+function renderPrac(){
+  let chips='<div class="filters"><button class="chip'+(pracFilter==='ALL'?' active':'')+'" onclick="setPrac(\'ALL\')">ALL</button>';
+  Object.keys(DATA.parts).forEach(k=>chips+='<button class="chip'+(pracFilter===k?' active':'')+'" onclick="setPrac(\''+k+'\')">'+k+'</button>');
+  chips+='</div>';
+  if(!pracPool.length){root.innerHTML=chips+'<div class="card">No questions for this filter.</div>';return;}
+  const q=pracPool[pracIdx]; pracAnswered=false;
+  let opts='';
+  q.opts.forEach((o,i)=>opts+='<button class="opt" data-i="'+i+'" onclick="pracChoose(this,'+i+','+q.ci+')">'+o+'</button>');
+  root.innerHTML=chips+
+    '<div class="card"><div class="ptag"><span>Part '+q.p+' &middot; '+DATA.parts[q.p]+'</span><span>'+(pracIdx+1)+' / '+pracPool.length+'</span></div>'+
+    '<div class="stem">'+q.stem+'</div><div class="opts">'+opts+'</div>'+
+    '<div class="feedback" id="pfb"></div><div class="expl" id="pexpl"></div></div>'+
+    '<div class="controls"><button class="btn primary" id="pnext" style="display:none" onclick="pracNext()">Next &rarr;</button>'+
+    '<button class="btn" onclick="buildPrac();renderPrac()">Shuffle</button></div>'+
+    '<div class="scoresub" style="margin-top:1rem">Session score: '+pracScore.c+' / '+pracScore.t+'</div>';
+}
+function setPrac(f){ pracFilter=f; pracScore={c:0,t:0}; buildPrac(); renderPrac(); }
+function pracChoose(btn,i,ci){
+  if(pracAnswered)return; pracAnswered=true; pracScore.t++;
+  const q=pracPool[pracIdx];
+  document.querySelectorAll('.opt').forEach((o,k)=>{o.classList.add('disabled'); if(k===ci)o.classList.add('correct');});
+  const fb=document.getElementById('pfb');
+  if(i===ci){pracScore.c++; fb.className='feedback r'; fb.innerHTML='&#10003; Correct.';}
+  else{btn.classList.add('wrong'); fb.className='feedback w'; fb.innerHTML='&#10007; Not quite.';}
+  document.getElementById('pexpl').innerHTML=q.expl;
+  document.getElementById('pnext').style.display='inline-block';
+  document.querySelector('.scoresub').textContent='Session score: '+pracScore.c+' / '+pracScore.t;
+}
+function pracNext(){ pracIdx=(pracIdx+1)%pracPool.length; renderPrac(); }
+
+/* ---------- EXAM ---------- */
+let exMock=null, exQs=[], exAns={}, exFlag={}, exCur=0, exTimer=null, exLeft=0, exDone=false, saqAward={};
+function renderExamSelect(){
+  timerEl.style.display='none';
+  const best=loadBest();
+  function mc(n){
+    const qs=DATA.mocks[n]; const mins=Math.floor(qs.length*DATA.secs/60), secs=(qs.length*DATA.secs)%60;
+    const mcq=qs.filter(q=>q.t==='MCQ').length, saq=qs.length-mcq;
+    const b=best[n]!=null?('Best: '+best[n]+'%'):'';
+    return '<div class="mockcard"><h3>Mock '+n+'</h3>'+
+      '<div class="meta">'+qs.length+' questions &middot; '+mcq+' MCQ + '+saq+' short-answer</div>'+
+      '<div class="meta">'+String(mins).padStart(2,"0")+':'+String(secs).padStart(2,"0")+' &middot; '+DATA.secs+'s per question</div>'+
+      '<div class="best">'+b+'</div>'+
+      '<button class="btn primary" onclick="startExam(\''+n+'\')">Start Mock '+n+'</button></div>';
+  }
+  root.innerHTML='<div class="note">Each mock has 40 questions (30 auto-marked MCQ + 10 short-answer). The timer counts down the whole paper at 80 seconds per question; it auto-submits at zero. MCQs are marked automatically; short answers reveal a model answer for self-marking. Progress is not saved mid-exam, so finish in one sitting.</div>'+
+    '<div class="startgrid">'+mc('1')+mc('2')+'</div>';
+}
+function startExam(n){
+  exMock=n; exQs=DATA.mocks[n]; exAns={}; exFlag={}; saqAward={}; exCur=0; exDone=false;
+  exLeft=exQs.length*DATA.secs;
+  timerEl.style.display='inline-block'; tickRender();
+  if(exTimer)clearInterval(exTimer);
+  exTimer=setInterval(()=>{exLeft--; updateTimer(); if(exLeft<=0){clearInterval(exTimer); submitExam(true);}},1000);
+  renderExam();
+}
+function updateTimer(){
+  const m=Math.floor(exLeft/60), s=exLeft%60;
+  timerEl.textContent=String(m).padStart(2,"0")+':'+String(s).padStart(2,"0");
+  timerEl.classList.toggle('warn',exLeft<=120);
+}
+function tickRender(){updateTimer();}
+function renderExam(){
+  const q=exQs[exCur];
+  let body='';
+  if(q.t==='MCQ'){
+    let opts='';
+    q.opts.forEach((o,i)=>{const sel=exAns[exCur]===i?' sel':''; opts+='<button class="opt'+sel+'" onclick="exPick('+i+')">'+o+'</button>';});
+    body='<div class="opts">'+opts+'</div>';
+  }else{
+    const v=exAns[exCur]||'';
+    body='<textarea id="saq" placeholder="Type your answer here. A model answer will be shown for self-marking after you submit." oninput="exText(this.value)">'+v.replace(/</g,"&lt;")+'</textarea>';
+  }
+  const flagged=exFlag[exCur]?' on':'';
+  root.innerHTML='<div class="card"><div class="ptag"><span>Part '+q.p+' &middot; '+DATA.parts[q.p]+' &middot; Q'+(exCur+1)+'/'+exQs.length+'</span><span class="mk">'+(q.t==='MCQ'?'MCQ &middot; 1 mark':'Short answer &middot; '+q.marks+' marks')+'</span></div>'+
+    '<div class="stem">'+q.stem+'</div>'+body+'</div>'+
+    '<div class="controls">'+
+      '<button class="btn" onclick="exGo(-1)">&larr; Prev</button>'+
+      '<button class="btn flag'+flagged+'" onclick="exToggleFlag()">&#9873; Flag</button>'+
+      '<button class="btn" onclick="exGo(1)">Next &rarr;</button>'+
+      '<button class="btn primary" onclick="confirmSubmit()">Submit paper</button>'+
+    '</div>'+ palette();
+  if(q.t==='SAQ'){const ta=document.getElementById('saq'); if(ta){ta.focus();ta.setSelectionRange(ta.value.length,ta.value.length);}}
+}
+function palette(){
+  let cells='';
+  exQs.forEach((q,i)=>{
+    let cls='pcell'+(q.t==='SAQ'?' saq':'');
+    if(exAns[i]!==undefined && exAns[i]!=='') cls+=' ans';
+    if(exFlag[i]) cls+=' flagged';
+    if(i===exCur) cls+=' cur';
+    cells+='<button class="'+cls+'" onclick="exJump('+i+')">'+(i+1)+'</button>';
+  });
+  return '<div class="palette">'+cells+'</div>';
+}
+function exPick(i){exAns[exCur]=i; renderExam();}
+function exText(v){exAns[exCur]=v;}
+function exToggleFlag(){exFlag[exCur]=!exFlag[exCur]; renderExam();}
+function exGo(d){const ta=document.getElementById('saq'); if(ta)exAns[exCur]=ta.value; exCur=(exCur+d+exQs.length)%exQs.length; renderExam();}
+function exJump(i){const ta=document.getElementById('saq'); if(ta)exAns[exCur]=ta.value; exCur=i; renderExam();}
+function confirmSubmit(){const ta=document.getElementById('saq'); if(ta)exAns[exCur]=ta.value;
+  const unanswered=exQs.filter((q,i)=>exAns[i]===undefined||exAns[i]==='').length;
+  let msg='Submit the paper now?'; if(unanswered>0)msg='You have '+unanswered+' unanswered question(s). Submit anyway?';
+  if(confirm(msg)) submitExam(false);
+}
+function submitExam(auto){
+  if(exDone)return; exDone=true; if(exTimer)clearInterval(exTimer); timerEl.style.display='none';
+  renderResults(auto);
+}
+
+/* ---------- RESULTS ---------- */
+function renderResults(auto){
+  let mcqC=0,mcqT=0; const partTot={},partGot={};
+  exQs.forEach((q,i)=>{ partTot[q.p]=(partTot[q.p]||0)+(q.t==='MCQ'?1:q.marks); });
+  exQs.forEach((q,i)=>{ if(q.t==='MCQ'){mcqT++; if(exAns[i]===q.ci){mcqC++; partGot[q.p]=(partGot[q.p]||0)+1;}} });
+  // initialise SAQ awards to 0
+  exQs.forEach((q,i)=>{ if(q.t==='SAQ' && saqAward[i]===undefined) saqAward[i]=0; });
+  drawResults(auto,mcqC,mcqT,partTot,partGot);
+}
+function saqTotals(){let got=0,max=0; exQs.forEach((q,i)=>{if(q.t==='SAQ'){max+=q.marks;got+=(saqAward[i]||0);}}); return {got,max};}
+function combined(mcqC){const s=saqTotals(); const tot=exQs.length*0+ (exQs.filter(q=>q.t==='MCQ').length) + s.max; const got=mcqC+s.got; return {got,tot,pct:Math.round(100*got/tot)};}
+function drawResults(auto,mcqC,mcqT,partTot,partGot){
+  const s=saqTotals(); const c=combined(mcqC);
+  // recompute part bars including SAQ self-marks
+  const pg={}; Object.assign(pg,partGot);
+  exQs.forEach((q,i)=>{ if(q.t==='SAQ') pg[q.p]=(pg[q.p]||0)+(saqAward[i]||0); });
+  saveBest(exMock,c.pct);
+  let bars='';
+  Object.keys(DATA.parts).forEach(k=>{ if(partTot[k]){const v=Math.round(100*(pg[k]||0)/partTot[k]); bars+='<div class="partbar"><span class="pl">'+k+' '+DATA.parts[k]+'</span><div class="bar"><i style="width:'+v+'%"></i></div><span class="pv">'+(pg[k]||0)+'/'+partTot[k]+'</span></div>';}});
+  let rev='';
+  exQs.forEach((q,i)=>{
+    if(q.t==='MCQ'){
+      const ok=exAns[i]===q.ci; const your=exAns[i]!==undefined?q.opts[exAns[i]]:'<em>(blank)</em>';
+      rev+='<div class="rev-item"><div class="rq"><span class="rev-tag '+(ok?'ok':'no')+'">'+(ok?'correct':'incorrect')+'</span> &nbsp;Q'+(i+1)+'. '+q.stem+'</div>'+
+        '<div class="yours"><strong>Your answer:</strong> '+your+'</div>'+
+        (ok?'':'<div class="model"><div class="ml">Correct answer</div>'+q.opts[q.ci]+'</div>')+
+        '<div class="expl">'+q.expl+'</div></div>';
+    }else{
+      const your=(exAns[i]&&exAns[i].trim())?exAns[i].replace(/</g,"&lt;").replace(/\n/g,"<br>"):'<em>(blank)</em>';
+      rev+='<div class="rev-item"><div class="rq"><span class="rev-tag self">self-mark &middot; '+q.marks+' marks</span> &nbsp;Q'+(i+1)+'. '+q.stem+'</div>'+
+        '<div class="yours"><strong>Your answer:</strong><br>'+your+'</div>'+
+        '<div class="model"><div class="ml">Model answer</div>'+q.model+'</div>'+
+        '<div class="selfmark"><span class="lbl">Award yourself:</span>'+
+          smBtn(i,0,'0')+smBtn(i,q.marks/2,'Half ('+(q.marks/2)+')')+smBtn(i,q.marks,'Full ('+q.marks+')')+
+        '</div></div>';
+    }
+  });
+  root.innerHTML=
+    '<div class="card"><div class="scorebig" id="bigscore">'+c.pct+'%</div>'+
+    '<div class="scoresub">'+(auto?'Time expired &mdash; auto-submitted. ':'')+'MCQ '+mcqC+'/'+mcqT+' (auto) &middot; Short answer '+s.got+'/'+s.max+' (self) &middot; Combined '+c.got+'/'+c.tot+'</div>'+
+    '<div style="margin-top:0.5rem">'+bars+'</div></div>'+
+    '<div class="note">Short answers are scored by you against the model answers below. Use the Half / Full buttons &mdash; the score above updates live. Award Half where you captured the core idea but missed marking points.</div>'+
+    '<div class="controls"><button class="btn" onclick="setMode(\'examselect\')">&larr; Back to mocks</button>'+
+    '<button class="btn primary" onclick="startExam(exMock)">Retake Mock '+exMock+'</button></div>'+
+    '<div class="review">'+rev+'</div>';
+}
+function smBtn(i,val,label){const on=(saqAward[i]===val)?' on':''; return '<button class="sm'+on+'" onclick="award('+i+','+val+')">'+label+'</button>';}
+function award(i,val){saqAward[i]=val;
+  let mcqC=0; exQs.forEach((q,k)=>{if(q.t==='MCQ'&&exAns[k]===q.ci)mcqC++;});
+  // re-render results to refresh score + bars + button states
+  const partTot={},partGot={};
+  exQs.forEach(q=>partTot[q.p]=(partTot[q.p]||0)+(q.t==='MCQ'?1:q.marks));
+  exQs.forEach((q,k)=>{if(q.t==='MCQ'&&exAns[k]===q.ci)partGot[q.p]=(partGot[q.p]||0)+1;});
+  drawResults(false,mcqC,exQs.filter(q=>q.t==='MCQ').length,partTot,partGot);
+  // keep scroll position roughly
+  document.querySelector('.review').scrollIntoView({block:'start'});
+}
+
+/* ---------- best scores ---------- */
+function loadBest(){try{return JSON.parse(localStorage.getItem(LS_BEST)||'{}');}catch(e){return {};}}
+function saveBest(n,pct){try{const b=loadBest(); if(b[n]==null||pct>b[n]){b[n]=pct; localStorage.setItem(LS_BEST,JSON.stringify(b));}}catch(e){}}
+
+/* ---------- mode ---------- */
+function setMode(m){
+  if(m==='practice'){mode='practice'; setActive('m-prac'); if(exTimer)clearInterval(exTimer); timerEl.style.display='none'; buildPrac(); renderPrac();}
+  else{mode='examselect'; setActive('m-exam'); if(exTimer)clearInterval(exTimer); renderExamSelect();}
+}
+function setActive(id){document.getElementById('m-prac').classList.toggle('active',id==='m-prac');document.getElementById('m-exam').classList.toggle('active',id==='m-exam');}
+
+buildPrac(); renderPrac();
+</script>
+</body>
+</html>
